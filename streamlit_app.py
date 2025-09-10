@@ -36,7 +36,7 @@ date_display = [
 # ---------------------
 num_hospitals = st.sidebar.number_input("病院数", min_value=6, max_value=10, value=8)
 
-st.subheader("病院名")
+st.sidebar.subheader("病院名")
 
 hospital_names = []
 for i in range(num_hospitals):
