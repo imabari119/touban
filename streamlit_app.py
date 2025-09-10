@@ -34,7 +34,7 @@ date_display = [
 # ---------------------
 # 病院数・病院名
 # ---------------------
-num_hospitals = st.sidebar.number_input("病院数", min_value=6, max_value=10, value=8)
+num_hospitals = st.sidebar.number_input("病院数", min_value=6, max_value=10, value=9)
 
 st.sidebar.subheader("病院名")
 
@@ -145,34 +145,36 @@ if st.button("当番表を作成"):
             st.success(f"{len(collector.solutions)} パターンの当番表が見つかりました！")
 
             csv_files = {}
-
-            # 複数解をタブで表示
             tabs = st.tabs([f"案 {i + 1}" for i in range(len(collector.solutions))])
 
             for i, sol in enumerate(collector.solutions):
                 with tabs[i]:
-                    schedule_df = pd.DataFrame({"日付": date_labels, "担当病院": sol})
-                    st.dataframe(schedule_df, use_container_width=True)
+                    # 縦形式データ（日付ごとの担当病院）
+                    df_schedule = pd.DataFrame({"日付": date_labels, "担当病院": sol})
+                    st.dataframe(df_schedule, width="stretch")
 
-                    # CSV ダウンロード
-                    csv_bytes = io.BytesIO()
-                    csv_bytes.write(schedule_df.to_csv(index=False).encode("utf-8-sig"))
-                    csv_bytes.seek(0)
-
-                    file_name = f"hospital_schedule_{year}_{month}_pattern{i + 1}.csv"
-                    st.download_button(
-                        label=f"📥 パターン {i + 1} をCSVでダウンロード",
-                        data=csv_bytes,
-                        file_name=file_name,
-                        mime="text/csv",
+                    # ✅ 横形式に変換（病院 × 日付 の「○」マーク表）
+                    df_schedule["mark"] = "○"
+                    df_matrix = (
+                        df_schedule.pivot(index="担当病院", columns="日付", values="mark")
+                        .reindex(index=hospital_names)
+                        .fillna("")
                     )
 
-                    # zip 用に保存
+                    # Excel で貼れるようにTSV形式に変換
+                    tsv_text = df_matrix.to_csv(sep="\t", header=False, index=True)
+
+                    # ✅ 手動コピー用に表示
+                    st.text_area(f"📋 パターン {i + 1} のコピー用データ", tsv_text, height=200)
+
+                    # ZIP 用に保存（縦形式）
+                    csv_bytes = io.BytesIO()
+                    csv_bytes.write(df_schedule.to_csv(index=False).encode("utf-8-sig"))
+                    csv_bytes.seek(0)
+                    file_name = f"hospital_schedule_{year}_{month}_pattern{i + 1}.csv"
                     csv_files[file_name] = csv_bytes.getvalue()
 
-            # ---------------------
-            # すべて zip にまとめる
-            # ---------------------
+            # ✅ ZIP 一括ダウンロード（全体）
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for file_name, csv_data in csv_files.items():
@@ -184,6 +186,5 @@ if st.button("当番表を作成"):
                 file_name=f"hospital_schedules_{year}_{month}.zip",
                 mime="application/zip",
             )
-
         else:
             st.error("解が見つかりませんでした。条件を見直してください。")
