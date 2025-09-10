@@ -8,7 +8,7 @@ import pandas as pd
 import streamlit as st
 from ortools.sat.python import cp_model
 
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="今治市救急病院 当番表作成ツール", layout="wide")
 st.title("救急病院 当番表作成ツール")
 
 # ---------------------
