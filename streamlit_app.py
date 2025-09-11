@@ -80,7 +80,7 @@ max_patterns = st.sidebar.number_input(
 # ---------------------
 st.subheader("非番日の指定")
 
-ng_df = pd.DataFrame(False, index=hospital_names, columns=date_display)
+ng_df = pd.DataFrame(True, index=hospital_names, columns=date_display)
 
 # 編集用
 edited_ng_df = st.data_editor(ng_df, width="stretch")
