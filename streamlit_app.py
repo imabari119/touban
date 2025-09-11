@@ -15,8 +15,12 @@ st.title("救急病院 当番表作成ツール")
 # 年月指定
 # ---------------------
 st.sidebar.header("設定")
-year = st.sidebar.number_input("年 (YYYY)", min_value=2020, max_value=2100, value=date.today().year)
-month = st.sidebar.number_input("月 (1-12)", min_value=1, max_value=12, value=date.today().month)
+year = st.sidebar.number_input(
+    "年 (YYYY)", min_value=2020, max_value=2100, value=date.today().year
+)
+month = st.sidebar.number_input(
+    "月 (1-12)", min_value=1, max_value=12, value=date.today().month
+)
 
 # その月の日数を計算
 days_in_month = calendar.monthrange(year, month)[1]
@@ -28,7 +32,9 @@ date_labels = dates.strftime("%Y-%m-%d").tolist()
 # 曜日を日本語に変換
 weekday_map = ["月", "火", "水", "木", "金", "土", "日"]
 date_display = [
-    d.strftime("%m/%d") + f"({weekday_map[d.weekday()] if not jpholiday.is_holiday(d) else '祝'})" for d in dates
+    d.strftime("%m/%d")
+    + f"({weekday_map[d.weekday()] if not jpholiday.is_holiday(d) else '祝'})"
+    for d in dates
 ]
 
 # ---------------------
@@ -56,9 +62,18 @@ for h in hospital_names:
         value=days_in_month // num_hospitals,
     )
 
+
 # 合計チェック
 if sum(exact_shifts.values()) != days_in_month:
-    st.sidebar.error(f"回数の合計が {days_in_month} になっていません！（現在: {sum(exact_shifts.values())}）")
+    st.sidebar.error(
+        f"回数の合計が {days_in_month} になっていません！（現在: {sum(exact_shifts.values())}）"
+    )
+
+st.sidebar.subheader("パターン")
+# 最大パターン数
+max_patterns = st.sidebar.number_input(
+    "最大パターン数", min_value=1, max_value=50, value=10
+)
 
 # ---------------------
 # 非番日入力 (チェックボックス付き)
@@ -75,14 +90,17 @@ ng_days = {}
 for h in hospital_names:
     ng_days[h] = [i + 1 for i, val in enumerate(edited_ng_df.loc[h]) if val]
 
-st.sidebar.subheader("パターン")
-# 最大パターン数
-max_patterns = st.sidebar.number_input("最大パターン数", min_value=1, max_value=50, value=10)
 
 # ---------------------
 # スケジュール作成ボタン
 # ---------------------
 if st.button("当番表を作成"):
+    available_days = (~edited_ng_df).sum(axis=1).rename("対応可能日数")
+    duty_counts = pd.Series(exact_shifts, name="当番数")
+    schedule_status = pd.concat([available_days, duty_counts], axis=1)
+
+    st.dataframe(schedule_status, width="stretch")
+
     if sum(exact_shifts.values()) != days_in_month:
         st.error("割り当て回数の合計が日数と一致していません！")
     else:
@@ -156,7 +174,9 @@ if st.button("当番表を作成"):
                     # ✅ 横形式に変換（病院 × 日付 の「○」マーク表）
                     df_schedule["mark"] = "○"
                     df_matrix = (
-                        df_schedule.pivot(index="担当病院", columns="日付", values="mark")
+                        df_schedule.pivot(
+                            index="担当病院", columns="日付", values="mark"
+                        )
                         .reindex(index=hospital_names)
                         .fillna("")
                     )
@@ -165,7 +185,9 @@ if st.button("当番表を作成"):
                     tsv_text = df_matrix.to_csv(sep="\t", header=False, index=True)
 
                     # ✅ 手動コピー用に表示
-                    st.text_area(f"📋 パターン {i + 1} のコピー用データ", tsv_text, height=200)
+                    st.text_area(
+                        f"📋 パターン {i + 1} のコピー用データ", tsv_text, height=200
+                    )
 
                     # ZIP 用に保存（縦形式）
                     csv_bytes = io.BytesIO()
