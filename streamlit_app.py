@@ -3,7 +3,9 @@ import pandas as pd
 import pymupdf
 import jpholiday
 
-st.title("救急病院カレンダー変換")
+st.title("広報いまばりの救急病院カレンダーPDF変換")
+
+st.markdown("[広報いまばり](https://www.city.imabari.ehime.jp/kouhou/koho/)から最新の救急病院（PDF）をダウンロードしてください")
 
 # PDFファイルのアップロード
 uploaded_file = st.file_uploader("PDFファイルをアップロードしてください", type="pdf")
