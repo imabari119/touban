@@ -160,7 +160,7 @@ if uploaded_file is not None:
                 {1: "指定なし", 4: "整形外科", 5: "内科", 7: "小児科", 9: "指定なし"}
             )
 
-            df = df4.reindex(columns=["date", "week", "medical", "name", "time"])
+            df = df4.reindex(columns=["date", "week", "kind", "medical", "name", "time"])
 
             df["date"] = df["date"].dt.strftime("%Y-%m-%d")
 
