@@ -173,7 +173,7 @@ if uploaded_file is not None:
             st.download_button(
                 label="CSVファイルをダウンロード",
                 data=csv,
-                file_name="result.csv",
+                file_name=f"touban_{yyyymm}.csv",
                 mime="text/csv",
             )
 
