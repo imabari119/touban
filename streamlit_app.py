@@ -49,18 +49,18 @@ if uploaded_file is not None:
             for pattern, replacement in patterns.items():
                 df1["text"] = df1["text"].str.replace(pattern, replacement, regex=True)
 
-            df1["text"] = (
-                df1["text"]
-                .str.replace(r"\n(救内小)(\S)", r"\n\1 \2", regex=True)
-                .str.replace(r"\n(救(?!内小))(\S)", r"\n\1 \2", regex=True)
-                .str.replace(r"\n(内|小|島|歯)(\S)", r"\n\1 \2", regex=True)
-                .str.replace(r"([救内小島歯]+)\s+", r"\1 ", regex=True)
-                .str.replace(r"(整形外科のみ)\s+", r"整 ", regex=True)
-                .str.replace(r"\n歯 .*", "", regex=True)
-                .str.replace("~", "～")
-                .str.replace(r"\n\(", "(", regex=True)
-                .str.replace(r"\n献血\n市民会館前\(\d{1,2}:\d{2}～\d{1,2}:\d{2}\)", "", regex=True)
-            )
+                df1["text"] = (
+                    df1["text"]
+                    .str.replace(r"\n(救内小)(\S)", r"\n\g<1> \g<2>", regex=True)
+                    .str.replace(r"\n(救(?!内小))(\S)", r"\n\g<1> \g<2>", regex=True)
+                    .str.replace(r"\n(内|小|島|歯)(\S)", r"\n\g<1> \g<2>", regex=True)
+                    .str.replace(r"([救内小島歯]+)\s+", r"\g<1> ", regex=True)
+                    .str.replace(r"(整形外科のみ)\s+", r"整 ", regex=True)
+                    .str.replace(r"\n歯 .*", "", regex=True)
+                    .str.replace("~", "～")
+                    .str.replace(r"\n\(", "(", regex=True)
+                    .str.replace(r"\n献血\n市民会館前\(\d{1,2}:\d{2}～\d{1,2}:\d{2}\)", "", regex=True)
+                )
 
             # 日付から始まるもののみ抽出
             df1 = df1.loc[df1["text"].str.match(r"^\d")]
