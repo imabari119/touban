@@ -59,7 +59,7 @@ if uploaded_file is not None:
                 .str.replace(r"\n歯 .*", "", regex=True)
                 .str.replace("~", "～")
                 .str.replace(r"\n\(", "(", regex=True)
-                .str.replace(r"\n献血\n市民会館前\(10:00～12:00\)", "", regex=True)
+                .str.replace(r"\n献血\n市民会館前\(\d{1,2}:\d{2}～\d{1,2}:\d{2}\)", "", regex=True)
             )
 
             # 日付から始まるもののみ抽出
