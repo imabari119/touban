@@ -10,9 +10,11 @@ st.markdown("[広報いまばり](https://www.city.imabari.ehime.jp/kouhou/koho/
 # PDFファイルのアップロード
 uploaded_file = st.file_uploader("PDFファイルをアップロードしてください", type="pdf")
 
+yyyymm = pd.Timestamp.today().strftime("%Y%m")
+
 if uploaded_file is not None:
     # 年月の入力
-    yyyymm = st.text_input("年月を入力してください (例: 202604)", "202604")
+    yyyymm = st.text_input(f"年月を入力してください (例: {yyyymm})", yyyymm)
 
     if st.button("変換実行"):
         try:
